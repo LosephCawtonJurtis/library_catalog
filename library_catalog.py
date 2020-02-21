@@ -93,7 +93,6 @@ class Software(LibraryItem):
 
 
 class Catalog:
-    _private_items_list = {}
     menu = """
     Library Catalog Menu
     
@@ -113,30 +112,33 @@ class Catalog:
         x = int(input(self.menu))
         return x
 
-    @classmethod
-    def search_library(cls, name, i_type):
-        for items in cls._private_items_list:
+    def search_library(self, name, i_type):
+        for items in self.items:
             if items.name == name:
-                return cls._private_items_list[name]
+                return self.items[name]
         return "item not in Catalog"
 
     def remove_item(self, name, i_type):
         print("rsuccess")
 
-    @classmethod
-    def add_item(cls, name, i_type):
-        cls._private_items_list = {name: i_type}
+    def add_item(self, name, i_type):
+        self.items = {name: i_type}
 
-
+#class CategoryTag:
+#    make fucking shit and have it be good3
 
 master = Catalog("master", "none")
-user_input = master.display_menu()
 
-if user_input == 0:
-    master.search_library(input("item name"), input("item type"))
-elif user_input == 2:
-    master.add_item(input("item name"), input("item type"))
-elif user_input == 3:
-    Catalog.remove_item(input("item name"), input("item type"))
-elif user_input == 1:
-    print(Catalog._private_items_list)
+while True:
+    user_input = master.display_menu()
+
+    if user_input == 1 :
+        master.search_library(input("item name"), input("item type"))
+    elif user_input == 3:
+        master.add_item(input("item name"), input("item type"))
+    elif user_input == 4:
+        master.remove_item(input("item name"), input("item type"))
+    elif user_input == 2:
+        print(Catalog._private_items_list)
+
+user_input = master.display_menu()
