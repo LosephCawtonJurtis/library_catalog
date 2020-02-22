@@ -15,11 +15,18 @@ class LibraryItem:
         :param name: (string) Name of item
         :param isbn: (string) ISBN number for the item
         :param tags: (list) List of CategoryTags
-        """
+
         self.name = name
         self.isbn = isbn
         self.tags = tags
         self.resource_type = 'Generic'  # This is the type of item being stored
+        """
+        self.name = name
+        self.isbn = isbn
+        if tags:
+            self.tags = tags
+        else:
+            self.tags = list()
 
     def match(self, filter_text):
         """True/False whether the item is a match for the filter_text
@@ -104,41 +111,50 @@ class Catalog:
     Choose an option
            """
 
-    def __init__(self, name, items):
+    def __init__(self, name, item, value):
         self.name = name
-        self.items = items
+        self.item = {item: value}
 
     def display_menu(self):
         x = int(input(self.menu))
         return x
 
     def search_library(self, name, i_type):
-        for items in self.items:
-            if items.name == name:
-                return self.items[name]
-        return "item not in Catalog"
+        filtered_items = {}
+        start_length_items = len(filtered_items)
+        for item in self.item:
+            if self.item[item] == i_type:
+                filtered_items[item] = self.item[item]
+        if len(filtered_items) > start_length_items:
+            return filtered_items
+        else:
+            return "item not in Catalog"
 
     def remove_item(self, name, i_type):
         print("rsuccess")
 
     def add_item(self, name, i_type):
-        self.items = {name: i_type}
+        self.item[name] = i_type
+        print(self.item)
 
-#class CategoryTag:
+
+# class CategoryTag:
 #    make fucking shit and have it be good3
 
-master = Catalog("master", "none")
+
+master = Catalog("master", "none", "none")
+
 
 while True:
     user_input = master.display_menu()
 
-    if user_input == 1 :
-        master.search_library(input("item name"), input("item type"))
+    if user_input == 1:
+        print(master.search_library(str(input("item name")), str(input("item type"))))
     elif user_input == 3:
         master.add_item(input("item name"), input("item type"))
     elif user_input == 4:
         master.remove_item(input("item name"), input("item type"))
     elif user_input == 2:
-        print(Catalog._private_items_list)
+        print(master.item)
 
 user_input = master.display_menu()
