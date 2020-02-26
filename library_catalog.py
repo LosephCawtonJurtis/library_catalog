@@ -68,12 +68,14 @@ class LibraryItem:
 
 class Book(LibraryItem):
 
-    def __init__(self, name, isbn, num_pages, tags=None):
+    def __init__(self, name, isbn, num_pages, author, tags=None):
         super().__init__(name,isbn,tags)
         self.num_pages = num_pages
+        self.author = author
 
     def match(self, filter_text):
-        match = super().match(filter_text) or filter_text == self.num_pages
+        return super().match() or self.author == filter_text
+
 
 
 class DVD(LibraryItem):
@@ -85,7 +87,7 @@ class DVD(LibraryItem):
 
     def match(self, filter_text):
         match = super().match(self, filter_text) or filter_text == self.rating
-        pass
+        return match
 
 
 class Software(LibraryItem):
@@ -142,19 +144,3 @@ class Catalog:
 #    make fucking shit and have it be good3
 
 
-master = Catalog("master", "none", "none")
-
-
-while True:
-    user_input = master.display_menu()
-
-    if user_input == 1:
-        print(master.search_library(str(input("item name")), str(input("item type"))))
-    elif user_input == 3:
-        master.add_item(input("item name"), input("item type"))
-    elif user_input == 4:
-        master.remove_item(input("item name"), input("item type"))
-    elif user_input == 2:
-        print(master.item)
-
-user_input = master.display_menu()
