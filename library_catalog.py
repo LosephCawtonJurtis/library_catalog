@@ -68,14 +68,12 @@ class LibraryItem:
 
 class Book(LibraryItem):
 
-    def __init__(self, name, isbn, num_pages, author, tags=None):
-        super().__init__(name,isbn,tags)
-        self.num_pages = num_pages
+    def __init__(self, name, isbn, author, tags=None):
+        super().__init__(name, isbn, tags)
         self.author = author
 
     def match(self, filter_text):
         return super().match() or self.author == filter_text
-
 
 
 class DVD(LibraryItem):
@@ -102,6 +100,7 @@ class Software(LibraryItem):
 
 
 class Catalog:
+    _private_list_ = []
     menu = """
     Library Catalog Menu
     
@@ -113,9 +112,10 @@ class Catalog:
     Choose an option
            """
 
-    def __init__(self, name, item, value):
+
+    def __init__(self, name):
         self.name = name
-        self.item = {item: value}
+        self._private_list_ = []
 
     def display_menu(self):
         x = int(input(self.menu))
@@ -133,14 +133,20 @@ class Catalog:
             return "item not in Catalog"
 
     def remove_item(self, name, i_type):
-        print("rsuccess")
+        pass
 
-    def add_item(self, name, i_type):
-        self.item[name] = i_type
-        print(self.item)
+    def add_item(self, name, isbn, i_type):
+        if i_type == 'book':
+            addition = Book(name, isbn, input("input author's name here "))
+        elif i_type == 'dvd':
+            addition = DVD(name, isbn, input('input runtime here '), input('input rating here '))
+        elif i_type == 'software':
+            addition = Software(name, isbn, input('input purpose here, ie photo editing '))
+        self._private_list_.append(addition)
 
+    def print_whole(self):
+        for items in self._private_list_:
+            print(self._private_list_[items])
 
-# class CategoryTag:
-#    make fucking shit and have it be good3
 
 
