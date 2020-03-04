@@ -46,14 +46,21 @@ class LibraryItem:
             filter_text.lower() == self.isbn.lower() or \
             filter_text.lower() in (str(tag).lower() for tag in self.tags)
 
-    def __str__(self):
+    def __str__(self, object_target):
         """Return a well formatted string representation of the item
 
         All instance variables are included.
 
         All subclasses must provide a __str__ method
         """
-        return f'{self.name}\n{self.isbn}\n{self.resource_type}\n{", ".join(self.tags)}'
+        # return f'{self.name}\n{self.isbn}\n{self.resource_type}\n{", ".join(self.tags)}'
+        if object_target.author:
+            text = f'{object_target.name} has and isbn of {object_target.isbn} and is authored by {object_target.author}'
+        elif object_target.rating:
+            text = f'{object_target.name} has and isbn of {object_target.isbn} and is rated {object_target.rating} with a runtime of {object_target.runtime}'
+        elif object_target.purpose:
+            text = f'{object_target.name} has and isbn of {object_target.isbn} and has a purpose of {object_target.purpose}'
+        return text
 
     def to_short_string(self):
         """Return a short string representation of the item
@@ -84,8 +91,8 @@ class DVD(LibraryItem):
         self.runtime = runtime
 
     def match(self, filter_text):
-        match = super().match(self, filter_text) or filter_text == self.rating
-        return match
+        return super().match(self, filter_text) or filter_text == self.rating
+
 
 
 class Software(LibraryItem):
@@ -96,7 +103,7 @@ class Software(LibraryItem):
 
     def match(self, filter_text):
         match = super().match(filter_text) or filter_text == self.purpose
-        pass
+        return match
 
 
 class Catalog:
@@ -117,36 +124,52 @@ class Catalog:
         self.name = name
         self._private_list_ = []
 
+    @staticmethod
+    def str(object_target):
+        if object_target.i_type == 'book':
+            text = f'{object_target.name} has and isbn of {object_target.isbn} and is authored by {object_target.author}'
+        elif object_target.i_type == 'dvd':
+            text = f'{object_target.name} has and isbn of {object_target.isbn} and is rated {object_target.rating} with a runtime of {object_target.runtime}'
+        elif object_target.i_type == 'software':
+            text = f'{object_target.name} has and isbn of {object_target.isbn} and has a purpose of {object_target.purpose}'
+        return 'test'
+
+
     def display_menu(self):
         x = int(input(self.menu))
         return x
 
-    def search_library(self, name, i_type):
-        filtered_items = {}
+    def search_library(self, name):
+        filtered_items = []
         start_length_items = len(filtered_items)
-        for item in self.item:
-            if self.item[item] == i_type:
-                filtered_items[item] = self.item[item]
+        for items in self._private_list_:
+            if items.name == name:
+                text = items.__str__(items)
+                filtered_items.append(text)
         if len(filtered_items) > start_length_items:
             return filtered_items
         else:
             return "item not in Catalog"
 
-    def remove_item(self, name, i_type):
+    def remove_item(self, name,):
+        for items in self._private_list_:
+            if items.name == name:
+                self._private_list_.remove(items)
         pass
 
     def add_item(self, name, isbn, i_type):
         if i_type == 'book':
-            addition = Book(name, isbn, input("input author's name here "))
+            addition = Book(name, isbn, str(input("input author's name here ")))
         elif i_type == 'dvd':
-            addition = DVD(name, isbn, input('input runtime here '), input('input rating here '))
+            addition = DVD(name, isbn, str(input('input runtime here ')), str(input('input rating here ')))
         elif i_type == 'software':
-            addition = Software(name, isbn, input('input purpose here, ie photo editing '))
+            addition = Software(name, isbn, str(input('input purpose here, ie photo editing ')))
         self._private_list_.append(addition)
 
     def print_whole(self):
         for items in self._private_list_:
-            print(self._private_list_[items])
+            print(str(Catalog.__str__(items)))
+            print(items.__str__(items))
 
 
 
