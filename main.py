@@ -24,9 +24,7 @@ while True:
     elif user_input == 2:
         Catalog.print_whole()
     elif user_input == 3:
-        check = input('do you want to create an item? yes/no: ')
-        if check == 'yes':
-            creation_type = input('create a book, dvd, or software')
+
 
     elif user_input == 4:
 
