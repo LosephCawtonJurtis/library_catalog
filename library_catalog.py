@@ -27,6 +27,7 @@ class LibraryItem:
             self.tags = tags
         else:
             self.tags = list()
+            self.resource_type = 'Generic'
 
     def match(self, filter_text):
         """True/False whether the item is a match for the filter_text
@@ -46,21 +47,15 @@ class LibraryItem:
             filter_text.lower() == self.isbn.lower() or \
             filter_text.lower() in (str(tag).lower() for tag in self.tags)
 
-    def __str__(self, object_target):
+    def __str__(self):
         """Return a well formatted string representation of the item
 
         All instance variables are included.
 
         All subclasses must provide a __str__ method
         """
-        # return f'{self.name}\n{self.isbn}\n{self.resource_type}\n{", ".join(self.tags)}'
-        if object_target.author:
-            text = f'{object_target.name} has and isbn of {object_target.isbn} and is authored by {object_target.author}'
-        elif object_target.rating:
-            text = f'{object_target.name} has and isbn of {object_target.isbn} and is rated {object_target.rating} with a runtime of {object_target.runtime}'
-        elif object_target.purpose:
-            text = f'{object_target.name} has and isbn of {object_target.isbn} and has a purpose of {object_target.purpose}'
-        return text
+        return f'{self.name}\n{self.isbn}\n{self.resource_type}\n{", ".join(self.tags)}'
+
 
     def to_short_string(self):
         """Return a short string representation of the item
@@ -78,9 +73,22 @@ class Book(LibraryItem):
     def __init__(self, name, isbn, author, tags=None):
         super().__init__(name, isbn, tags)
         self.author = author
+        self.resource_type = 'Book'
 
     def match(self, filter_text):
-        return super().match() or self.author == filter_text
+        return super().match(filter_text) or self.author == filter_text
+
+    def __str__(self):
+        return super().__str__() + '\n' + self.author
+
+    @classmethod
+    def create_book(cls):
+        name = input('name of book: ')
+        isbn = input('isbn of book: ')
+        author = input('author of book: ')
+        tags = None
+
+        return cls(name, isbn, author, tags)
 
 
 class DVD(LibraryItem):
@@ -88,68 +96,54 @@ class DVD(LibraryItem):
     def __init__(self, name, isbn, runtime, rating, tags=None):
         super().__init__(self, name, isbn, tags)
         self.rating = rating
+        self.resource_type = 'DVD'
         self.runtime = runtime
 
     def match(self, filter_text):
         return super().match(self, filter_text) or filter_text == self.rating
 
+    @classmethod
+    def create_DVD(cls):
+        name = input('name of DVD: ')
+        isbn = input('isbn of DVD: ')
+        runtime = input('runtime of DVD: ')
+        rating = input('rating of DVD: ')
+        tags = None
 
-
+        return cls(name, isbn, runtime, rating, tags)
 class Software(LibraryItem):
 
     def __init__(self, name, isbn, purpose, tags=None):
         super().__init__(self, name, isbn, tags)
         self.purpose = purpose
+        self.resource_type = 'Software'
 
     def match(self, filter_text):
         match = super().match(filter_text) or filter_text == self.purpose
         return match
 
+    @classmethod
+    def create_Software(cls):
+        name = input('name of software: ')
+        isbn = input('isbn of software: ')
+        purpose = input('purpose of software: ')
+        tags = None
+
+        return cls(name, isbn, purpose, tags)
+
 
 class Catalog:
-    _private_list_ = []
-    menu = """
-    Library Catalog Menu
-    
-    1. Search Catalog
-    2. Print the entire catalog
-    3. Add item to catalog
-    4. remove item from catalog
-    
-    Choose an option
-           """
-
 
     def __init__(self, name):
         self.name = name
         self._private_list_ = []
 
-    @staticmethod
-    def str(object_target):
-        if object_target.i_type == 'book':
-            text = f'{object_target.name} has and isbn of {object_target.isbn} and is authored by {object_target.author}'
-        elif object_target.i_type == 'dvd':
-            text = f'{object_target.name} has and isbn of {object_target.isbn} and is rated {object_target.rating} with a runtime of {object_target.runtime}'
-        elif object_target.i_type == 'software':
-            text = f'{object_target.name} has and isbn of {object_target.isbn} and has a purpose of {object_target.purpose}'
-        return 'test'
-
-
-    def display_menu(self):
-        x = int(input(self.menu))
-        return x
-
-    def search_library(self, name):
+    def search_library(self, search_term):
         filtered_items = []
-        start_length_items = len(filtered_items)
-        for items in self._private_list_:
-            if items.name == name:
-                text = items.__str__(items)
-                filtered_items.append(text)
-        if len(filtered_items) > start_length_items:
-            return filtered_items
-        else:
-            return "item not in Catalog"
+        for item in self._private_list_:
+            if item.match(search_term):
+                filtered_items.append(item)
+        return filtered_items
 
     def remove_item(self, name,):
         for items in self._private_list_:
@@ -157,14 +151,8 @@ class Catalog:
                 self._private_list_.remove(items)
         pass
 
-    def add_item(self, name, isbn, i_type):
-        if i_type == 'book':
-            addition = Book(name, isbn, str(input("input author's name here ")))
-        elif i_type == 'dvd':
-            addition = DVD(name, isbn, str(input('input runtime here ')), str(input('input rating here ')))
-        elif i_type == 'software':
-            addition = Software(name, isbn, str(input('input purpose here, ie photo editing ')))
-        self._private_list_.append(addition)
+    def add_item(self, new_item):
+        self._private_list_.append(new_item)
 
     def print_whole(self):
         for items in self._private_list_:
@@ -172,4 +160,12 @@ class Catalog:
             print(items.__str__(items))
 
 
-
+if __name__ == "__main__":
+    library = Catalog('Champlain Library')
+    book1 = Book('Harry Potter','23423','JK Rowlings')
+    library.add_item(book1)
+    book2 = Book.create_book()
+    library.add_item(book2)
+    search_results = library.search_library('JK Rowlings')
+    print(f'Search Results: ')
+    print(*search_results)
