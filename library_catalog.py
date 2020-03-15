@@ -2,6 +2,7 @@
 Contains definitions for the abstract base class LibraryItem as well as CategoryTags
 """
 
+
 class LibraryItem:
     """Base class for all items stored in a library catalog
 
@@ -56,7 +57,6 @@ class LibraryItem:
         """
         return f'{self.name}\n{self.isbn}\n{self.resource_type}\n{", ".join(self.tags)}'
 
-
     def to_short_string(self):
         """Return a short string representation of the item
 
@@ -94,13 +94,16 @@ class Book(LibraryItem):
 class DVD(LibraryItem):
 
     def __init__(self, name, isbn, runtime, rating, tags=None):
-        super().__init__(self, name, isbn, tags)
+        super().__init__(name, isbn, tags)
         self.rating = rating
         self.resource_type = 'DVD'
         self.runtime = runtime
 
     def match(self, filter_text):
-        return super().match(self, filter_text) or filter_text == self.rating
+        return super().match(filter_text) or filter_text == self.rating
+
+    def __str__(self):
+        return super().__str__() + '\n' + self.runtime + '\n' + self.rating
 
     @classmethod
     def create_DVD(cls):
@@ -111,10 +114,12 @@ class DVD(LibraryItem):
         tags = None
 
         return cls(name, isbn, runtime, rating, tags)
-class Software(LibraryItem):
+
+
+class software(LibraryItem):
 
     def __init__(self, name, isbn, purpose, tags=None):
-        super().__init__(self, name, isbn, tags)
+        super().__init__(name, isbn, tags)
         self.purpose = purpose
         self.resource_type = 'Software'
 
@@ -122,8 +127,11 @@ class Software(LibraryItem):
         match = super().match(filter_text) or filter_text == self.purpose
         return match
 
+    def __str__(self):
+        return super().__str__() + '\n' + self.purpose
+
     @classmethod
-    def create_Software(cls):
+    def create_software(cls):
         name = input('name of software: ')
         isbn = input('isbn of software: ')
         purpose = input('purpose of software: ')
@@ -145,7 +153,7 @@ class Catalog:
                 filtered_items.append(item)
         return filtered_items
 
-    def remove_item(self, name,):
+    def remove_item(self, name):
         for items in self._private_list_:
             if items.name == name:
                 self._private_list_.remove(items)
@@ -155,9 +163,8 @@ class Catalog:
         self._private_list_.append(new_item)
 
     def print_whole(self):
-        for items in self._private_list_:
-            print(str(Catalog.__str__(items)))
-            print(items.__str__(items))
+        for item in self._private_list_:
+            print(item)
 
 
 if __name__ == "__main__":
@@ -166,6 +173,9 @@ if __name__ == "__main__":
     library.add_item(book1)
     book2 = Book.create_book()
     library.add_item(book2)
+    software1 = software.create_software()
+    library.add_item(software1)
     search_results = library.search_library('JK Rowlings')
     print(f'Search Results: ')
     print(*search_results)
+    library.print_whole()
