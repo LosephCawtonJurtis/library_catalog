@@ -69,20 +69,52 @@ class LibraryItem:
 
 
 class Book(LibraryItem):
+    '''many functions are repeated with minor changes so they will only be described in this class
+    Book extends library item'''
 
     def __init__(self, name, isbn, author, tags=None):
-        super().__init__(name, isbn, tags)
+        """ initializes an instance of a subclass and defines it's base attributes and functions
+        :param:
+        name - name of the instance
+        isbn - isbn of the instance
+        tags - not utilized yet
+
+        author - subclass specific parameter denoting the author of the book
+
+        :returns:
+        nothin
+        """
+        super().__init__(name, isbn, tags) # call to the super class for predefined parameters
         self.author = author
         self.resource_type = 'Book'
 
     def match(self, filter_text):
+        """ match defines the terms you can use to search for the instance inside of the catalog
+        :param:
+        filter_text - the text given by the user to perform the search with
+        :return:
+        returns a boolean value based on whether the filter text matched any attribute values that the instance
+        can be searched by
+        """
         return super().match(filter_text) or self.author == filter_text
 
     def __str__(self):
+        """converts the attribute values of a given class to a user readable format to convey information about the physical
+        object being represented
+        :return:
+        returns a more readable list of attributes
+        """
         return super().__str__() + '\n' + self.author
+
+    def to_short_string(self): # performs the same action as above but returns an abbreviated list
+        return self.name + '-' + self.resource_type + '-' + self.isbn
 
     @classmethod
     def create_book(cls):
+        """ gathers all data from a user that is required to create a subclass instance
+        :return:
+        data to fill in attributes when instantiating an instance of a subclass
+        """
         name = input('name of book: ')
         isbn = input('isbn of book: ')
         author = input('author of book: ')
@@ -104,6 +136,9 @@ class DVD(LibraryItem):
 
     def __str__(self):
         return super().__str__() + '\n' + self.runtime + '\n' + self.rating
+
+    def to_short_string(self):
+        return self.name + '-' + self.resource_type + '-' + self.isbn
 
     @classmethod
     def create_DVD(cls):
@@ -130,6 +165,9 @@ class software(LibraryItem):
     def __str__(self):
         return super().__str__() + '\n' + self.purpose
 
+    def to_short_string(self):
+        return self.name + '-' + self.resource_type + '-' + self.isbn
+
     @classmethod
     def create_software(cls):
         name = input('name of software: ')
@@ -141,12 +179,22 @@ class software(LibraryItem):
 
 
 class Catalog:
+    """ primary structure for storing all libraryitem based objects as well as defines UI logic for interacting with
+    the program"""
 
-    def __init__(self, name):
+    def __init__(self, name):  # class initializer
         self.name = name
         self._private_list_ = []
 
     def search_library(self, search_term):
+        """ iterates through all objects in the catalog's list to find any that have search_term matching data for a
+        specific attribute as the search term
+
+        :param:
+        search_term - the term given by the user to match with attribute data in given objects
+        :return:
+        returns a list of all objects that had matching pieces of data
+        """
         filtered_items = []
         for item in self._private_list_:
             if item.match(search_term):
@@ -154,28 +202,47 @@ class Catalog:
         return filtered_items
 
     def remove_item(self, name):
+        """ iterates through all items in the list to find any that match the name given before removing them from the
+        catalog
+
+        :param:
+        name - the object name being searched for
+        :return:
+        returns nothing
+        """
         for items in self._private_list_:
             if items.name == name:
                 self._private_list_.remove(items)
         pass
 
     def add_item(self, new_item):
+        """ adds an already created item to the catalog
+
+        :param:
+        new_item - the name of the item to be added
+        :return:
+        returns nothing
+        """
         self._private_list_.append(new_item)
 
     def print_whole(self):
+        """ iterates through the entire catalog and prints the abridged data for each item
+        :return:
+        returns nothing
+        """
         for item in self._private_list_:
-            print(item)
+            print(item.to_short_string())
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # test code that seems like it's worth keeping as a reference for part 2
     library = Catalog('Champlain Library')
-    book1 = Book('Harry Potter','23423','JK Rowlings')
+    book1 = Book('Harry Potter','23423','JK Rowling')
     library.add_item(book1)
     book2 = Book.create_book()
     library.add_item(book2)
     software1 = software.create_software()
     library.add_item(software1)
-    search_results = library.search_library('JK Rowlings')
+    search_results = library.search_library('JK Rowling')
     print(f'Search Results: ')
     print(*search_results)
     library.print_whole()
