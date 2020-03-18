@@ -1,9 +1,11 @@
+from abc import ABC, abstractmethod
+
 """
 Contains definitions for the abstract base class LibraryItem as well as CategoryTags
 """
 
 
-class LibraryItem:
+class LibraryItem(ABC):
     """Base class for all items stored in a library catalog
 
     Provides a simple LibraryItem with only a few attributes
