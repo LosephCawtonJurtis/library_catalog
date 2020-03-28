@@ -216,7 +216,7 @@ class CategoryTags:
             cls.all_category_tags()
             user_input = input('enter the name of the tag you would like to use: ')
             for tag in cls._all_tags:
-                if user_input == tag:
+                if user_input == tag.name:
                     return tag
 
 
