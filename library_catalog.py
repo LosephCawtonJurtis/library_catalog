@@ -57,7 +57,11 @@ class LibraryItem(ABC):
 
         All subclasses must provide a __str__ method
         """
-        return f'{self.name}\n{self.isbn}\n{self.resource_type}\n{", ".join(self.tags)}'
+        # return f'{self.name}\n{self.isbn}\n{self.resource_type}\n{", ".join(self.tags)}'
+        # I made an edit in your code here because I think that I just don't understand how you
+        # want tags to work and if this is all it takes to get my understanding of tags to function
+        # I'm hoping that will be understandable
+        return f'{self.name}\n{self.isbn}\n{self.resource_type}\n,{self.tags}'
 
     def to_short_string(self):
         """Return a short string representation of the item
@@ -120,7 +124,7 @@ class Book(LibraryItem):
         name = input('name of book: ')
         isbn = input('isbn of book: ')
         author = input('author of book: ')
-        tags = None
+        tags = CategoryTags.create_or_choose_tag()
 
         return cls(name, isbn, author, tags)
 
@@ -148,7 +152,7 @@ class DVD(LibraryItem):
         isbn = input('isbn of DVD: ')
         runtime = input('runtime of DVD: ')
         rating = input('rating of DVD: ')
-        tags = None
+        tags = CategoryTags.create_or_choose_tag()
 
         return cls(name, isbn, runtime, rating, tags)
 
@@ -175,9 +179,46 @@ class software(LibraryItem):
         name = input('name of software: ')
         isbn = input('isbn of software: ')
         purpose = input('purpose of software: ')
-        tags = None
+        tags = CategoryTags.create_or_choose_tag()
 
         return cls(name, isbn, purpose, tags)
+
+
+class CategoryTags:
+    """"""
+    _all_tags = []
+
+    def __init__(self, name, description):
+        self.name = name
+        self.description = description
+
+    def __str__(self):
+        return super().__str__() + '\n' + self.name + '-' + self.description
+
+    def to_short_string(self):
+        return self.name + '-' + self.description
+
+    @classmethod
+    def all_category_tags(cls):
+        for tag in cls._all_tags:
+            print(tag.to_short_string())
+
+    @classmethod
+    def create_or_choose_tag(cls):
+        user_input = input('would you like to create a new tag or use an existing one?(create/use): ')
+        if user_input == 'create':
+            name = input('input tag name: ')
+            description = input('describe the tag: ')
+            return_tag = cls(name, description)
+            cls._all_tags.append(return_tag)
+            return return_tag
+        else:
+            cls.all_category_tags()
+            user_input = input('enter the name of the tag you would like to use: ')
+            for tag in cls._all_tags:
+                if user_input == tag:
+                    return tag
+
 
 
 class Catalog:
@@ -237,14 +278,16 @@ class Catalog:
 
 
 if __name__ == "__main__":  # test code that seems like it's worth keeping as a reference for part 2
-    library = Catalog('Champlain Library')
-    book1 = Book('Harry Potter','23423','JK Rowling')
-    library.add_item(book1)
-    book2 = Book.create_book()
-    library.add_item(book2)
-    software1 = software.create_software()
-    library.add_item(software1)
-    search_results = library.search_library('JK Rowling')
-    print(f'Search Results: ')
-    print(*search_results)
-    library.print_whole()
+    # library = Catalog('Champlain Library')
+    # book1 = Book('Harry Potter','23423','JK Rowling')
+    # library.add_item(book1)
+    # book2 = Book.create_book()
+    # library.add_item(book2)
+    # software1 = software.create_software()
+    # library.add_item(software1)
+    # search_results = library.search_library('JK Rowling')
+    # print(f'Search Results: ')
+    # print(*search_results)
+    # library.print_whole()
+    CategoryTags.create_or_choose_tag()
+    CategoryTags.all_category_tags()
